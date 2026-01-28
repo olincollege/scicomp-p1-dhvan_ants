@@ -1,15 +1,11 @@
-[tool.black]
-line-length = 80
-preview = true
-enable-unstable-feature = ["string_processing"]
-
-[tool.pylint.main]
-# Pygame contains C code, which causes Pylint to report many false positive
-# warnings. Suppress those here.
-extension-pkg-allow-list = "pygame"
-
-[tool.pylint.format]
-max-line-length = 80
-
-[tool.pylint."messages control"]
-disable = ["c-extension-no-member"]
+[project]
+name = "scicomp-p1-dhvan-ants"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.1",
+    "pygame>=2.6.1",
+]
