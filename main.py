@@ -4,7 +4,7 @@ import numpy as np
 
 class Simulation:
     DEPOSITION_RATE = 12
-    EVAPORATION_RATE = 1
+    EVAPORATION_RATE = 4
     def __init__(self):
         self.released_ants: list[Ant] = []
         self.gui = GUI()

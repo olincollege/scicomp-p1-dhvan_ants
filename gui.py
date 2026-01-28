@@ -34,7 +34,7 @@ class GUI:
         for y, x in np.ndindex(grid.shape):
             value = grid[y, x]
             if(value > 0):
-                light_value = 80 - (value * 5)
+                light_value = min(100, 20 + (value * 5))
                 blue.hsla = (240, 100, light_value, 100)
                 pygame.draw.circle(self.screen, blue, (y * 3, x * 3), 3)
         
