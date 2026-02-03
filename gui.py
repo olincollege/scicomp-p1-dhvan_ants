@@ -39,4 +39,3 @@ class GUI:
                 light_value = min(100, 20 + (value * 5))
                 blue.hsla = (240, 100, light_value, 100)
                 pygame.draw.circle(self.screen, blue, (y * 3, x * 3), 3)
-        

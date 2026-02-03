@@ -16,13 +16,6 @@ class Ant:
         (-1, -1),   # NW (7)
     ]
     
-    TURNING_KERNEL_PAPER = [
-        0.360 / 2,
-        0.047 / 2,
-        0.008 / 2,
-        0.004 / 2
-    ]
-    
     TURNING_KERNEL = [
         0.135,
         0.031,
@@ -49,12 +42,10 @@ class Ant:
     def __init__(self, init_pos):
         self.pos = init_pos
         self.direction = random.choice(self.VALID_DIRECTIONS)
-        # self.direction = self.VALID_DIRECTIONS[0]
         
         self.mode = self.MODE["Explore"]
         
     def move(self, grid):
-        
         trail_direction = self.check_for_trail(grid)
 
         if(self.mode == self.MODE["Follow"] or trail_direction != (0, 0)):
@@ -107,7 +98,6 @@ class Ant:
             concentration = grid[rel_pos[0], rel_pos[1]]
             if(concentration > 60.0): concentration = 60.0
             concentrations.append(concentration)
-
             
         concentrations = np.array(concentrations)
         
@@ -121,11 +111,9 @@ class Ant:
         max_idx = np.where(concentrations == max_concentration)[0][0]
         
         if(max_concentration > 4.0):
-            return relative_direction_list[idx_check[max_idx]]        
-        
+            return relative_direction_list[idx_check[max_idx]]
 
         return (0, 0)
-        
         
     def get_relative_directions(self, direction_idx):
         return self.VALID_DIRECTIONS[direction_idx:] + self.VALID_DIRECTIONS[0:direction_idx]
