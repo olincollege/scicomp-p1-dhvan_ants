@@ -29,7 +29,7 @@ class GUI:
         pygame.quit()
 
     def draw_ant(self, position):
-        pygame.draw.circle(self.screen, "red", position, 6)
+        pygame.draw.circle(self.screen, "red", position, 3)
         
     def draw_grid(self, grid):
         blue = pygame.Color(0, 0, 255)
