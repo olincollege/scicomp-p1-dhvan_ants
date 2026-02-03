@@ -1,3 +1,5 @@
+# ant.py
+
 import random
 import numpy as np
 
@@ -9,14 +11,21 @@ class Ant:
         (1, 0),   # East (2)
         (1, 1),   # SE (3)
         (0, 1),  # South (4)
-        (-1, 1), # SW (3)
-        (-1, 0),  # West (2)
-        (-1, -1),   # NW (1)
+        (-1, 1), # SW (5)
+        (-1, 0),  # West (6)
+        (-1, -1),   # NW (7)
+    ]
+    
+    TURNING_KERNEL_PAPER = [
+        0.360 / 2,
+        0.047 / 2,
+        0.008 / 2,
+        0.004 / 2
     ]
     
     TURNING_KERNEL = [
-        0.360,
-        0.047,
+        0.135,
+        0.031,
         0.008,
         0.004
     ]
@@ -40,52 +49,28 @@ class Ant:
     def __init__(self, init_pos):
         self.pos = init_pos
         self.direction = random.choice(self.VALID_DIRECTIONS)
+        # self.direction = self.VALID_DIRECTIONS[0]
         
         self.mode = self.MODE["Explore"]
         
     def move(self, grid):
-        surrounding_concentrations = []
-        for direction in self.VALID_DIRECTIONS:
-            if(self.direction[0] == -direction[0] and self.direction[1] == -direction[1]):
-                surrounding_concentrations.append(0.0)
-                continue
-            surrounding_square = np.add(self.pos, direction)
-            if(not self.in_bounds(surrounding_square)): 
-                surrounding_concentrations.append(0.0)
-                continue
-            surrounding_concentrations.append(grid[surrounding_square[0], surrounding_square[1]])
         
-        forward_idx = self.VALID_DIRECTIONS.index(self.direction)
-        if(surrounding_concentrations[forward_idx] > 7.0):
-            follow_step = self.direction
-            self.mode = self.MODE["Follow"]
-        else:
-            max_concentration = max(surrounding_concentrations)
-            max_idx = np.where(np.array(surrounding_concentrations) == max_concentration)[0]            
-            
-            if(len(max_idx) > 1):
-                self.mode = self.MODE["Explore"]
-            elif(max_concentration > 7.0):
-                idx = surrounding_concentrations.index(max_concentration)
-                follow_step = self.VALID_DIRECTIONS[idx]
+        trail_direction = self.check_for_trail(grid)
+
+        if(self.mode == self.MODE["Follow"] or trail_direction != (0, 0)):
+            fidelity = random.choices([0, 1], [0.95, 0.05])[0]
+            if(trail_direction != (0, 0) and fidelity == 0):
+                self.direction = trail_direction
                 self.mode = self.MODE["Follow"]
             else:
                 self.mode = self.MODE["Explore"]
-       
-        if(self.mode == self.MODE["Follow"]):
-            lost_trail = random.choices([0, 1], [0.95, 0.05])[0]
-            if(lost_trail == 1):
-                self.mode = self.MODE["Explore"]
-            else:
-                self.direction = follow_step
-            
-        if(self.mode == self.MODE["Explore"]):
+        
+        if(self.mode == self.MODE["Explore"] or trail_direction == (0, 0)):
             self.direction = self.turn()
-
+            
         self.pos = np.add(self.pos, self.direction)
         
-        if(not self.in_bounds(self.pos)): return False
-        return True
+        return self.in_bounds(self.pos)
     
     def turn(self):
         direction_idx = self.VALID_DIRECTIONS.index(self.direction)
@@ -104,8 +89,52 @@ class Ant:
             
         return random.choices(relative_directions, self.WEIGHTS)[0]
     
+    def check_for_trail(self, grid):
+        previous_position = self.pos
+        previous_direction = self.direction
+        
+        relative_direction_list = self.get_relative_directions(self.VALID_DIRECTIONS.index(previous_direction))
+        idx_check = [0, 1, 7]
+        concentrations = []
+        for idx in idx_check:
+            rel_dir = relative_direction_list[idx]
+            rel_pos = np.add(previous_position, rel_dir)
+            
+            if(not self.in_bounds(rel_pos)):
+                concentrations.append(0.0)
+                continue
+                
+            concentration = grid[rel_pos[0], rel_pos[1]]
+            if(concentration > 60.0): concentration = 60.0
+            concentrations.append(concentration)
+
+            
+        concentrations = np.array(concentrations)
+        
+        max_concentration = np.max(concentrations)
+        num_max = np.count_nonzero(concentrations == max_concentration)
+        
+        if(num_max > 1):
+            if(concentrations[0] > 1.0): return relative_direction_list[idx_check[0]]
+            return (0, 0)
+
+        max_idx = np.where(concentrations == max_concentration)[0][0]
+        
+        if(max_concentration > 4.0):
+            return relative_direction_list[idx_check[max_idx]]        
+        
+
+        return (0, 0)
+        
+        
+    def get_relative_directions(self, direction_idx):
+        return self.VALID_DIRECTIONS[direction_idx:] + self.VALID_DIRECTIONS[0:direction_idx]
+    
     def get_pos(self):
         return self.pos
+    
+    def get_mode(self):
+        return self.mode
     
     def in_bounds(self, position):
         x = position[0]

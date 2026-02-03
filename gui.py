@@ -1,3 +1,5 @@
+# gui.py
+
 import pygame
 import numpy as np
 
@@ -27,7 +29,7 @@ class GUI:
         pygame.quit()
 
     def draw_ant(self, position):
-        pygame.draw.circle(self.screen, "red", position, 3)
+        pygame.draw.circle(self.screen, "red", position, 6)
         
     def draw_grid(self, grid):
         blue = pygame.Color(0, 0, 255)
