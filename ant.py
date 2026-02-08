@@ -17,9 +17,9 @@ class Ant:
     ]
     
     TURNING_KERNEL = [
-        0.135,
-        0.031,
-        0.008,
+        0.360 / 2,
+        0.047 / 2,
+        0.008 / 2,
         0.004
     ]
     
@@ -38,10 +38,15 @@ class Ant:
         "Explore": 0,
         "Follow": 1
     }
-    
+        
     def __init__(self, init_pos):
+        
         self.pos = init_pos
-        self.direction = random.choice(self.VALID_DIRECTIONS)
+        initial_directions = self.VALID_DIRECTIONS[1::2]
+        self.direction = random.choice(initial_directions)
+        
+        fid = 255 / 256
+        self.FIDELITY = [fid, 1 - fid]
         
         self.mode = self.MODE["Explore"]
         
@@ -49,7 +54,7 @@ class Ant:
         trail_direction = self.check_for_trail(grid)
 
         if(self.mode == self.MODE["Follow"] or trail_direction != (0, 0)):
-            fidelity = random.choices([0, 1], [0.95, 0.05])[0]
+            fidelity = random.choices([0, 1], self.FIDELITY)[0]
             if(trail_direction != (0, 0) and fidelity == 0):
                 self.direction = trail_direction
                 self.mode = self.MODE["Follow"]
@@ -96,7 +101,6 @@ class Ant:
                 continue
                 
             concentration = grid[rel_pos[0], rel_pos[1]]
-            if(concentration > 60.0): concentration = 60.0
             concentrations.append(concentration)
             
         concentrations = np.array(concentrations)
@@ -104,13 +108,15 @@ class Ant:
         max_concentration = np.max(concentrations)
         num_max = np.count_nonzero(concentrations == max_concentration)
         
+        
+        if(concentrations[0] > 0.0): return relative_direction_list[idx_check[0]]
+        
         if(num_max > 1):
-            if(concentrations[0] > 1.0): return relative_direction_list[idx_check[0]]
             return (0, 0)
 
         max_idx = np.where(concentrations == max_concentration)[0][0]
         
-        if(max_concentration > 4.0):
+        if(max_concentration > 0.0):
             return relative_direction_list[idx_check[max_idx]]
 
         return (0, 0)

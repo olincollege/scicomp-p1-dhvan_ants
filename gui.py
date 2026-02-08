@@ -29,13 +29,13 @@ class GUI:
         pygame.quit()
 
     def draw_ant(self, position):
-        pygame.draw.circle(self.screen, "red", position, 3)
+        pygame.draw.circle(self.screen, "red", position, 4.5)
         
     def draw_grid(self, grid):
         blue = pygame.Color(0, 0, 255)
         for y, x in np.ndindex(grid.shape):
             value = grid[y, x]
             if(value > 0):
-                light_value = min(100, 20 + (value * 5))
+                light_value = min(100, 0 + (value * 0.1))
                 blue.hsla = (240, 100, light_value, 100)
                 pygame.draw.circle(self.screen, blue, (y * 3, x * 3), 3)
