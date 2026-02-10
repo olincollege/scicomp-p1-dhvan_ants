@@ -2,6 +2,7 @@
 
 import random
 import numpy as np
+import config
 
 class Ant:
        
@@ -17,9 +18,9 @@ class Ant:
     ]
     
     TURNING_KERNEL = [
-        0.360 / 2,
-        0.047 / 2,
-        0.008 / 2,
+        config.TURNING_KERNEL[0] / 2,
+        config.TURNING_KERNEL[1] / 2,
+        config.TURNING_KERNEL[2] / 2,
         0.004
     ]
     
@@ -45,8 +46,7 @@ class Ant:
         initial_directions = self.VALID_DIRECTIONS[1::2]
         self.direction = random.choice(initial_directions)
         
-        fid = 255 / 256
-        self.FIDELITY = [fid, 1 - fid]
+        self.FIDELITY = [config.FIDELITY / 256, 1 - (config.FIDELITY / 256)]
         
         self.mode = self.MODE["Explore"]
         
@@ -134,6 +134,6 @@ class Ant:
         x = position[0]
         y = position[1]
         
-        if(x >= 0 and x < 256 and y >= 0 and y < 256):
+        if(x >= 0 and x < config.GRID_SIZE and y >= 0 and y < config.GRID_SIZE):
             return True
         return False 

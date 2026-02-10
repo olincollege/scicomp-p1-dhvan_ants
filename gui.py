@@ -2,11 +2,12 @@
 
 import pygame
 import numpy as np
+import config
 
 class GUI:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((256 * 3, 256 * 3))
+        self.screen = pygame.display.set_mode((config.GRID_SIZE * 3, config.GRID_SIZE * 3))
         self.clock = pygame.time.Clock()
         
     def loop(self, ant_pos = (0, 0), grid = []):
@@ -36,6 +37,6 @@ class GUI:
         for y, x in np.ndindex(grid.shape):
             value = grid[y, x]
             if(value > 0):
-                light_value = min(100, 0 + (value * 0.1))
+                light_value = min(100, 0 + (value * 0.075))
                 blue.hsla = (240, 100, light_value, 100)
                 pygame.draw.circle(self.screen, blue, (y * 3, x * 3), 3)
