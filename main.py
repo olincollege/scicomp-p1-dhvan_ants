@@ -29,7 +29,7 @@ class Simulation:
         # Initialize the pheromone grid to zero concentration.
         self.grid = np.zeros((config.GRID_SIZE, config.GRID_SIZE))
         
-    def loop(self, screenshot_filename):
+    def loop(self):
         """
         Main execution loop.
         
@@ -89,16 +89,13 @@ class Simulation:
             # time.sleep(0.01)
             
         print("\nSIMULATION DONE")
-        
-        if screenshot_filename:
-            # We access the 'screen' surface from your GUI instance
-            pygame.image.save(self.gui.screen, screenshot_filename)
-            print(f"Screenshot saved to {screenshot_filename}")
             
-        # self.calculate_stats()
+        stats = self.calculate_stats()
+        print(f'F-L Ratio: {round(stats[0], 3)}  |  Follower Ants: {stats[1][1]}  |  Lost Ants: {stats[1][0]}')
+        print("Press 'X' on the pygame window to complete the simulation")
         
-        # while running:
-        #     running = self.gui.loop(ant_pos, self.grid)
+        while running:
+            running = self.gui.loop(ant_pos, self.grid)
         
         self.gui.quit_gui()
         
@@ -123,12 +120,8 @@ class Simulation:
         else:
             F_L_RATIO = ants_mode[1] / ants_mode[0]
         
-        print(F_L_RATIO)
-        
-        print(ants_mode)
-        
         return (F_L_RATIO, ants_mode)
         
 if __name__ == "__main__":
     sim = Simulation()
-    print(sim.loop("runs/experiments/ExC.png"))
+    sim.loop()
