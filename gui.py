@@ -76,7 +76,8 @@ class GUI:
                 # Map concentration value to HSL Lightness (0-100).
                 # The 0.075 multiplier scales the raw value to a visible range.
                 # Cap at 100 to prevent color wrapping errors.
-                light_value = min(100, 0 + (value * 0.075))
+                # light_value = min(100, 0 + (value * 0.075))
+                light_value = min(100, 0 + (value * config.GUI_TRAIL_SCALE))
                 blue.hsla = (240, 100, light_value, 100)
                 # Draw scaled pixel (x3 size)
                 pygame.draw.circle(self.screen, blue, (y * 3, x * 3), 3)
