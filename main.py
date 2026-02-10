@@ -18,7 +18,8 @@ class Simulation:
     a burst is often necessary to reproduce the density of Figure 3 
     within the 1500-step limit.
     """
-    random.seed("Dhvan Shah")
+    if (config.RANDOM_SEED != None and config.RANDOM_SEED != ""):
+        random.seed(config.RANDOM_SEED)
     
     def __init__(self):
         self.released_ants: list[Ant] = []
@@ -77,6 +78,8 @@ class Simulation:
                     continue
                 
                 # Deposition: Ants add pheromone to their previous location (Rule 2)
+                # Adding the deposition rate + 1 here is neccessary due to the immediate
+                # evaporation in the next tick (at the top of the loop)
                 self.grid[old_position[0], old_position[1]] += config.DEPOSITION_RATE + 1
                 position = ant.get_pos()
                 ant_pos.append(position)

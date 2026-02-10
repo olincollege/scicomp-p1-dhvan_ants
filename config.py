@@ -11,6 +11,8 @@ GRID_SIZE = 256
 # Simulation duration. Figure 3 shows the state at t=1500.
 TIMESTEPS = 1500
 
+# [OPTIONAL] Seed to have consistent runs. Set to None or "" to get true random behavior
+RANDOM_SEED = "Dhvan Shah"
 
 # Ant Behavior
 
