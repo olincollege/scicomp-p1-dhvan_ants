@@ -14,15 +14,17 @@ TIMESTEPS = 1500
 # [OPTIONAL] Seed to have consistent runs. Set to None or "" to get true random behavior
 RANDOM_SEED = ""
 
+# GUI_TRAIL_SCALE = 0.075
+# GUI_TRAIL_SCALE = 0.100
 GUI_TRAIL_SCALE = 0.125
 
 # Ant Behavior
 
-# Fidelity (phi): Probability (0-255) that an ant follows a trail.
+# Fidelity: Probability (0-255) that an ant follows a trail.
 # 255 = High Fidelity (Fig 3a)
 # 251 = Medium Fidelity (Fig 3b)
 # 247 = Low Fidelity (Fig 3c)
-FIDELITY = 247
+FIDELITY = 251
 
 # Deposition Rate (tau): Pheromone added per step.
 # A value of 8 matches the standard run in Figure 3.

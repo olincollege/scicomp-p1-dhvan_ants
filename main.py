@@ -5,6 +5,8 @@ from gui import GUI
 import config
 import numpy as np
 import random
+import pickle
+import pygame
 
 class Simulation:    
     """
@@ -27,7 +29,7 @@ class Simulation:
         # Initialize the pheromone grid to zero concentration.
         self.grid = np.zeros((config.GRID_SIZE, config.GRID_SIZE))
         
-    def loop(self):
+    def loop(self, screenshot_filename):
         """
         Main execution loop.
         
@@ -39,9 +41,7 @@ class Simulation:
         """
         running = True
         tick = 0
-                
-        num_ants_released = 0
-        
+                        
         # Paper Ambiguity: The text specifies "releasing ants at a rate of one per iteration".
         # However, empirically, the distinct "X" pattern in Figure 3 only emerges 
         # if the environment is primed with a strong initial burst.
@@ -49,7 +49,6 @@ class Simulation:
         for _ in range(config.INITIAL_BURST_SIZE):
             new_ant = Ant((config.GRID_SIZE // 2, config.GRID_SIZE // 2))
             self.released_ants.append(new_ant)
-            num_ants_released += 1
             
         
         while running and tick < config.TIMESTEPS:
@@ -64,7 +63,6 @@ class Simulation:
             if(tick < config.TIMESTEP_STOP):
                 new_ant = Ant((config.GRID_SIZE // 2, config.GRID_SIZE // 2))
                 self.released_ants.append(new_ant)
-                num_ants_released += 1
             
             ant_pos = []
             # Use slice copy [:] to allow removing ants during iteration
@@ -91,9 +89,21 @@ class Simulation:
             # time.sleep(0.01)
             
         print("\nSIMULATION DONE")
-        print(f"Average ants released = {num_ants_released / 1500}")
-        self.calculate_stats()
+        
+        if screenshot_filename:
+            # We access the 'screen' surface from your GUI instance
+            pygame.image.save(self.gui.screen, screenshot_filename)
+            print(f"Screenshot saved to {screenshot_filename}")
+            
+        # self.calculate_stats()
+        
+        # while running:
+        #     running = self.gui.loop(ant_pos, self.grid)
+        
         self.gui.quit_gui()
+        
+        return self.calculate_stats()
+
         
     def calculate_stats(self):
         """
@@ -108,12 +118,70 @@ class Simulation:
             elif ant.mode == 1:
                 ants_mode[1] += 1
                 
-        F_L_RATIO = ants_mode[1] / ants_mode[0]
+        if ants_mode[0] == 0:
+            F_L_RATIO = 0
+        else:
+            F_L_RATIO = ants_mode[1] / ants_mode[0]
         
-        print(F_L_RATIO)
+        # print(F_L_RATIO)
         
-        print(ants_mode)
+        # print(ants_mode)
+        
+        return (F_L_RATIO, ants_mode)
         
 if __name__ == "__main__":
-    sim = Simulation()
-    sim.loop()
+    avg = []
+    fname = "runs/case2"
+    
+    print(f"Fidelity = {config.FIDELITY}")
+    
+    # Run 10 times to get a good average
+    NUM_RUNS = 10 
+    
+    for i in range(NUM_RUNS):
+        print(f"Starting Run {i+1}/{NUM_RUNS}...")
+        sim = Simulation()
+        
+        # Pass a unique filename for each run
+        # e.g., "case1_run_0.png", "case1_run_1.png"
+        stats = sim.loop(screenshot_filename=f"{fname}/{i}.png")
+        
+        avg.append(stats)
+        
+    ratio_sum = 0
+    for ratio, numbers in avg:
+        ratio_sum += ratio
+        
+    print(f"\nAverage F/L Ratio: {ratio_sum / NUM_RUNS}")
+    
+    with open(f"{fname}/data.pkl", 'wb') as f:
+        pickle.dump(avg, f)
+        
+    avg = []
+    fname = "runs/case3"
+    
+    config.FIDELITY = 247
+    
+    print(f"Fidelity = {config.FIDELITY}")
+    
+    # Run 10 times to get a good average
+    NUM_RUNS = 10 
+    
+    for i in range(NUM_RUNS):
+        print(f"Starting Run {i+1}/{NUM_RUNS}...")
+        sim = Simulation()
+        
+        # Pass a unique filename for each run
+        # e.g., "case1_run_0.png", "case1_run_1.png"
+        stats = sim.loop(screenshot_filename=f"{fname}/{i}.png")
+        
+        avg.append(stats)
+        
+    ratio_sum = 0
+    for ratio, numbers in avg:
+        ratio_sum += ratio
+        
+    print(f"\nAverage F/L Ratio: {ratio_sum / NUM_RUNS}")
+    
+    with open(f"{fname}/data.pkl", 'wb') as f:
+        pickle.dump(avg, f)

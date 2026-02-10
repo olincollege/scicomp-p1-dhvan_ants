@@ -8,7 +8,6 @@
         ".python-version": true,
         ".vscode": true,
         ".venv": true,
-        "pyproject.toml": true,
         "uv.lock": true,
         "__pycache__": true
     },
@@ -16,7 +15,6 @@
         ".python-version",
         ".vscode",
         ".venv",
-        "pyproject.toml",
         "uv.lock",
         "__pycache__"
     ]

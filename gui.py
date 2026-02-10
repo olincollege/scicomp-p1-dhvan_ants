@@ -20,7 +20,7 @@ class GUI:
         on standard displays (256x256 pixels is too small to see details).
         """
         pygame.init()
-        self.screen = pygame.display.set_mode((config.GRID_SIZE * 3, config.GRID_SIZE * 3))
+        self.screen = pygame.display.set_mode((config.GRID_SIZE * 3, config.GRID_SIZE * 3), flags=pygame.HIDDEN)
         self.clock = pygame.time.Clock()
         
     def loop(self, ant_pos = (0, 0), grid = []):
