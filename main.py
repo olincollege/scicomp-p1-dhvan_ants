@@ -7,6 +7,17 @@ import numpy as np
 import random
 
 class Simulation:    
+    """
+    Orchestrates the Ant Colony simulation.
+    
+    Manages the grid environment, ant population, and time-stepping.
+    
+    Note on Spawning:
+    This implementation supports an 'Initial Burst' of ants (configured in config.py).
+    While the paper specifies a rate of 'one per iteration', 
+    a burst is often necessary to reproduce the density of Figure 3 
+    within the 1500-step limit.
+    """
     random.seed("Dhvan Shah")
     
     def __init__(self):
@@ -15,6 +26,15 @@ class Simulation:
         self.grid = np.zeros((config.GRID_SIZE, config.GRID_SIZE))
         
     def loop(self):
+        """
+        Main execution loop.
+        
+        Performs the following steps per tick:
+        1. Evaporates pheromone linearly (grid - EVAPORATION_RATE).
+        2. Spawns new ants based on release settings.
+        3. Moves all ants and deposits pheromone.
+        4. Updates the GUI.
+        """
         running = True
         tick = 0
                 
