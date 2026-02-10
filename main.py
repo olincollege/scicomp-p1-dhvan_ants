@@ -23,6 +23,7 @@ class Simulation:
     def __init__(self):
         self.released_ants: list[Ant] = []
         self.gui = GUI()
+        # Initialize the pheromone grid to zero concentration.
         self.grid = np.zeros((config.GRID_SIZE, config.GRID_SIZE))
         
     def loop(self):
@@ -40,6 +41,10 @@ class Simulation:
                 
         num_ants_released = 0
         
+        # Paper Ambiguity: The text specifies "releasing ants at a rate of one per iteration".
+        # However, empirically, the distinct "X" pattern in Figure 3 only emerges 
+        # if the environment is primed with a strong initial burst.
+        # Without this, the 1500-step limit is too short for a single stream to build the network.
         for _ in range(config.INITIAL_BURST_SIZE):
             new_ant = Ant((config.GRID_SIZE // 2, config.GRID_SIZE // 2))
             self.released_ants.append(new_ant)
@@ -47,20 +52,31 @@ class Simulation:
             
         
         while running and tick < config.TIMESTEPS:
+            # Evaporate BEFORE movement.
+            # This ensures ants interact with the most up-to-date grid state for this tick.
+            # If we evaporated after, ants would be sensing "old" pheromone that should have decayed.
             self.grid = np.maximum(self.grid - config.EVAPORATION_RATE, 0)  
             
+            # Paper Ambiguity: Figure 3 captions show roughly 500 ants total at step 1500.
+            # A constant release rate of 1/tick would result in 1500+ ants.
+            # To match the visual density of the benchmark, we stop spawning at a cutoff point.
             if(tick < config.TIMESTEP_STOP):
                 new_ant = Ant((config.GRID_SIZE // 2, config.GRID_SIZE // 2))
                 self.released_ants.append(new_ant)
                 num_ants_released += 1
             
             ant_pos = []
+            # Use slice copy [:] to allow removing ants during iteration
             for ant in self.released_ants[:]:
                 old_position = ant.get_pos()
                 in_bounds = ant.move(self.grid)
+                
+                # Absorbing boundaries: ants leaving the lattice are removed
                 if(not in_bounds): 
                     self.released_ants.remove(ant)
                     continue
+                
+                # Deposition: Ants add pheromone to their previous location (Rule 2)
                 self.grid[old_position[0], old_position[1]] += config.DEPOSITION_RATE + 1
                 position = ant.get_pos()
                 ant_pos.append(position)
@@ -77,6 +93,11 @@ class Simulation:
         self.gui.quit_gui()
         
     def calculate_stats(self):
+        """
+        Calculates the Followers-to-Lost (F/L) ratio (p. 360).
+        
+        A higher ratio indicates a stronger, more defined trail network.
+        """
         ants_mode = [0, 0]
         for ant in self.released_ants:
             if ant.mode == 0:
