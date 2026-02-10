@@ -12,11 +12,11 @@ GRID_SIZE = 256
 TIMESTEPS = 1500
 
 # [OPTIONAL] Seed to have consistent runs. Set to None or "" to get true random behavior
-RANDOM_SEED = ""
+RANDOM_SEED = "Dhvan Shah"
 
-# GUI_TRAIL_SCALE = 0.075
+GUI_TRAIL_SCALE = 0.075
 # GUI_TRAIL_SCALE = 0.100
-GUI_TRAIL_SCALE = 0.125
+# GUI_TRAIL_SCALE = 0.125
 
 # Ant Behavior
 
@@ -24,7 +24,7 @@ GUI_TRAIL_SCALE = 0.125
 # 255 = High Fidelity (Fig 3a)
 # 251 = Medium Fidelity (Fig 3b)
 # 247 = Low Fidelity (Fig 3c)
-FIDELITY = 251
+FIDELITY = 255
 
 # Deposition Rate (tau): Pheromone added per step.
 # A value of 8 matches the standard run in Figure 3.
@@ -39,7 +39,7 @@ EVAPORATION_RATE = 1
 # The text says "one per iteration" (set this to 0 for strict adherence).
 # However, to actually get the density seen in Figure 3 within 1500 steps, 
 # you need a burst to kickstart the trails.
-INITIAL_BURST_SIZE = 120
+INITIAL_BURST_SIZE = 100
 
 # Stop adding ants after this timestep.
 # Prevents the grid from becoming a chaotic mess if running longer than the paper's 1500 steps.

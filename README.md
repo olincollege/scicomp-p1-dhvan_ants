@@ -59,7 +59,7 @@ The primary objective was to replicate **Figure 3** from the source paper.
 
 ## Replication
 
-To make sure the randomness of the model is accounted for, but I still get usable numbers, I ran the simulation for each case 10 times, and averaged the F-L ratio to get my final number. The below screenshots are what I consider matching the paper the closest. The rest of the screenshots are in runs/case<1,2,3>
+To mitigate the randomness in the model and obtain usable data, I ran the simulation 10 times for each case and averaged the `F / L` ratios. The images below show the runs that most closely matched the paper's benchmark. All other screenshots are archived in the `runs/case<1,2,3>` folders.
 
 ### Case 1
 
@@ -87,7 +87,7 @@ To make sure the randomness of the model is accounted for, but I still get usabl
 
 ### Case 3
 
-![Case 3 run of my model](media/C4.png)
+![Case 3 run of my model](media/C3.png)
 
 **Fidelity:** 247 / 256
 
@@ -96,7 +96,6 @@ To make sure the randomness of the model is accounted for, but I still get usabl
 **Average Number of Lost Ants:** 181.7
 
 **Average F-L Ratio:** 2.122
-
 
 ## Initial Burst Hypothesis
 While implementing this model, I encountered a significant discrepancy between the paper's text description and its visual results. This required straying from the literal instructions to accurately reproduce the papers results. 
@@ -111,11 +110,63 @@ The paper states that ants are released "at a rate of one per iteration"
 ### Solution
 I hypothesized that the authors of the papers likely primed their grid with a set number of ants. To test this, I implemented an optional Burst mode, where the first tick sends out 120 ants as opposed to just 1. 
 
-### Experiment A: No Burst
+To empirically verify the necessity of the "Initial Burst" and population control, I conducted three distinct experiments. All experiments utilized the following fixed parameters to isolate the variables of population injection and timing.
 
-### Experiment B: Burst, no limit
+**Fixed Parameters:**
+* **Fidelity:** 255 / 256 (High Fidelity)
+* **Deposition Rate:** 8 units/step
+* **Evaporation Rate:** 1 unit/step
+* **Simulation Duration:** 1500 Timesteps
+* **Random Seed:** "Dhvan Shah"
 
-### Experiment C: Burst, 1000 tick limit
+### Summary of Results
+
+| Experiment | Configuration | F/L Ratio | Followers | Lost Ants |
+| :--- | :--- | :--- | :--- | :--- |
+| **A** | No Burst (Standard) | 18.27 | 1078 | 59 |
+| **B** | Burst (No Limit) | 25.41 | 1169 | 46 |
+| **C** | **Burst + Limit** | **18.97** | **683** | **36** |
+
+---
+
+### Experiment A: Control
+*Releasing 1 ant per tick, continuous for 1500 steps.*
+
+![Experiment A Results](media/ExA.png)
+
+**Observation:** The high population density (Total: 1137 ants) creates a crowded network. While a pattern emerges, the sheer volume of Lost ants constantly exploring creates noise around the main trunk lines.
+
+**Statistics:**
+- **F/L Ratio:** 18.271
+- **Followers:** 1078
+- **Lost:** 59
+
+
+### Experiment B: Initial Burst (No Spawning Limit)
+*Burst of 120 ants at t=0, followed by 1 ant/tick for 1500 steps.*
+
+![Experiment B Results](media/ExB.png)
+
+**Observation:** Adding a burst massively increases the follower count. The existing trails are heavily reinforced by the initial wave, leading to an artificially high F/L ratio of 25.4. This density far exceeds the visual sparsity seen in the paper's Figure 3.
+
+**Statistics:**
+- **F/L Ratio:** 25.413
+- **Followers:** 1169
+- **Lost:** 46
+
+---
+
+### Experiment C: Burst with Population Control (The Fix)
+*Burst of 120 ants at t=0, spawning stops at t=1000.*
+
+![Experiment C Results](media/ExC.png)
+
+**Observation:** This configuration yields the closest match to the paper. By stopping the influx of new ants at t=1000, the population stabilizes at ~720 agents. The trail network is distinct, the "X" pattern is clear, and the F/L ratio (18.97) reflects a mature, stable system rather than a chaotic one.
+
+**Statistics:**
+- **F/L Ratio:** 18.972
+- **Followers:** 683
+- **Lost:** 36
 
 ## Capabilities
 - **Variable Fidelity**: Can simulate high vs. low fidelity systems by adjusting `FIDELITY` in `config.py`
@@ -123,9 +174,9 @@ I hypothesized that the authors of the papers likely primed their grid with a se
 - **Real-Time Visualization**: Uses `Pygame` to render ants and pheromone trails at 60FPS
 
 ## Limitations
-- **Burst Model**: Makes the assumption that the authors left out a crucial aspect of their model
-- **Grid Size**: Limited to a maximum of 512x512 grid size for any reasonable computational speed. Optimizations required to reach bigger grid sizes
-- **Color Scale**: Requires manual tuning of pheromone trail color scales in order to match source papers output. Source paper does say they had to do a similar thing though.
+- **Burst Model**: The model assumes the source paper omitted an initial burst of agent. This variation was necessary to match the visual density of the benchmark
+- **Grid Size**: The current implementation is optimized for the paper's 256x256 grid. Performance degrades significantly at grid sizes above 512x512, requiring further optimization
+- **Color Scale**: The pheromone visualization requires manual tuning of the color scale threshold to match the high-contrast look of the source paper, mirroring the saturation challenges mentioned by the authors
 
 ## File Structure
 - `main.py`: Simulation loop. Handles time-stepping, evaporation and spawning
@@ -137,15 +188,28 @@ I hypothesized that the authors of the papers likely primed their grid with a se
 ## Usage
 
 ### Requirements
-- Python 3.12+
-- `pip install -r requirements.txt`
+* **Python 3.12+**
+* Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+    
+### Reproducing Figure 3a
+To replicate the benchmark "X" pattern and F/L ratio:
 
-### Reproducing Figure 3.a
-1. Open `config.py`
-2. Set `FIDELITY = 255`
-3. OPTIONAL, set or unset `RANDOM_SEED`
-4. `python main.py`
-5. F-L Ratio will print to terminal upon completion (1500 timesteps)
+1.  Open `config.py`.
+2.  Set the fidelity parameter:
+    ```python
+    FIDELITY = 255
+    ```
+3.  *(Optional)* Set or unset `RANDOM_SEED` for reproducibility.
+4.  Run the simulation:
+    ```bash
+    python main.py
+    ```
+5.  The **F-L Ratio** will print to the terminal upon completion (1500 timesteps).
 
-### Running unit tests
-1. `pytest`
+### Running Unit Tests
+To verify the scientific logic and boundary conditions:
+```bash
+pytest

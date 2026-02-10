@@ -123,65 +123,12 @@ class Simulation:
         else:
             F_L_RATIO = ants_mode[1] / ants_mode[0]
         
-        # print(F_L_RATIO)
+        print(F_L_RATIO)
         
-        # print(ants_mode)
+        print(ants_mode)
         
         return (F_L_RATIO, ants_mode)
         
 if __name__ == "__main__":
-    avg = []
-    fname = "runs/case2"
-    
-    print(f"Fidelity = {config.FIDELITY}")
-    
-    # Run 10 times to get a good average
-    NUM_RUNS = 10 
-    
-    for i in range(NUM_RUNS):
-        print(f"Starting Run {i+1}/{NUM_RUNS}...")
-        sim = Simulation()
-        
-        # Pass a unique filename for each run
-        # e.g., "case1_run_0.png", "case1_run_1.png"
-        stats = sim.loop(screenshot_filename=f"{fname}/{i}.png")
-        
-        avg.append(stats)
-        
-    ratio_sum = 0
-    for ratio, numbers in avg:
-        ratio_sum += ratio
-        
-    print(f"\nAverage F/L Ratio: {ratio_sum / NUM_RUNS}")
-    
-    with open(f"{fname}/data.pkl", 'wb') as f:
-        pickle.dump(avg, f)
-        
-    avg = []
-    fname = "runs/case3"
-    
-    config.FIDELITY = 247
-    
-    print(f"Fidelity = {config.FIDELITY}")
-    
-    # Run 10 times to get a good average
-    NUM_RUNS = 10 
-    
-    for i in range(NUM_RUNS):
-        print(f"Starting Run {i+1}/{NUM_RUNS}...")
-        sim = Simulation()
-        
-        # Pass a unique filename for each run
-        # e.g., "case1_run_0.png", "case1_run_1.png"
-        stats = sim.loop(screenshot_filename=f"{fname}/{i}.png")
-        
-        avg.append(stats)
-        
-    ratio_sum = 0
-    for ratio, numbers in avg:
-        ratio_sum += ratio
-        
-    print(f"\nAverage F/L Ratio: {ratio_sum / NUM_RUNS}")
-    
-    with open(f"{fname}/data.pkl", 'wb') as f:
-        pickle.dump(avg, f)
+    sim = Simulation()
+    print(sim.loop("runs/experiments/ExC.png"))
